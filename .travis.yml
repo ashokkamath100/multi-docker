@@ -1,0 +1,34 @@
+sudo: required
+services: 
+  - docker 
+
+# setting up test environment
+before_install:
+  # we attach a tag to the docker image we are building 
+  # we use the Dockerfile.dev in the client directory
+  # specify the build context ./client (where all of the project files necessary
+  # to bulid the image can be found)
+  - docker build -t jacksparrow19/react-test -f ./client/Dockerfile.dev ./client
+  # we can specify more images here to build if we want to run 
+  # test suites from them 
+
+# script is the primary test running section 
+# any scripts that return non-zero, TravisCI 
+# will assume test suite failed
+script:
+  # we add -- --coverage because 'npm run test' does not exit on its own
+  # and instead enters a watch mode unless we tell it to exit
+  - docker run -e CI=true jacksparrow19/react-test npm run test
+
+# after all the tests have ran successfully, 
+# we create the production configurations for each of our projects
+# so we need to run docker build for client, nginx, server, worker 
+# folders
+after_success:
+  # can give the image tag any name but we choose multi-[project name] 
+  # since this is a multi container project
+  - docker build -t jacksparrow19/multi-client ./client
+  - docker build -t jacksparrow19/multi-nginx ./nginx
+  - docker build -t jacksparrow19/multi-server ./server
+  - docker build -t jacksparrow19/multi-worker ./worker
+
