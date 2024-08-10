@@ -27,16 +27,17 @@ script:
 after_success:
   # can give the image tag any name but we choose multi-[project name] 
   # since this is a multi container project
-  - docker build -t jacksparrow19/multi-client ./client
   - docker build -t jacksparrow19/multi-nginx ./nginx
   - docker build -t jacksparrow19/multi-server ./server
   - docker build -t jacksparrow19/multi-worker ./worker
+  - docker build -t jacksparrow19/multi-client ./client
+
   # Need to login to docker CLI
   # 'echo' part of the command retrieves the DOCKER_PASSWORD environment variable
   # and emits that as STDIN to the other half of the command
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
   # take those images and push them to Docker hub
-  - docker push jacksparrow19/multi-client
   - docker push jacksparrow19/multi-nginx
   - docker push jacksparrow19/multi-server
   - docker push jacksparrow19/multi-worker
+  - docker push jacksparrow19/multi-client

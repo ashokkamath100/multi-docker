@@ -1,0 +1,27 @@
+{
+    "AWSEBDockerrunVersion": 2, 
+    "containerDefinitions": [
+        {
+            "name": "client",
+            "image": "jacksparrow19/multi-client", 
+            "hostname": "client", 
+            "essential": false
+        },
+        {
+            "name": "nginx",
+            "image": "jacksparrow19/multi-nginx"
+        },
+        {
+            "name": "server",
+            "image": "jacksparrow19/multi-server",
+            "hostname": "api",
+            "essential": false
+        },
+        {
+            "name": "worker",
+            "image": "jacksparrow19/multi-worker",
+            "hostname": "worker", 
+            "essential": false
+        }
+    ]
+}
