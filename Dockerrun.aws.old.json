@@ -9,7 +9,16 @@
         },
         {
             "name": "nginx",
-            "image": "jacksparrow19/multi-nginx"
+            "image": "jacksparrow19/multi-nginx", 
+            "hostname": true,
+            "essential": true, 
+            "portMappings": [
+                {
+                    "hostPort": 80,
+                    "containerPort": 80
+                }
+            ], 
+            "links": ["client", "server"]
         },
         {
             "name": "server",

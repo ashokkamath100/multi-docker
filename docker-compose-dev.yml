@@ -1,0 +1,73 @@
+version: '3'
+services:
+  postgres:
+    image: 'postgres:latest'
+    environment:
+      - POSTGRES_PASSWORD=postgres_password
+  redis: 
+    image: 'redis:latest'
+  nginx:
+    # since nginx is responsible for routing all of our app's traffic
+    # we need it to be running always
+    restart: always
+    build: 
+      dockerfile: Dockerfile.dev
+      context: ./nginx
+    ports:
+        # map port 3050 on our local machine to port 80 inside the container
+        # so we use  localhost:3050 when we want to access our app 
+      - '3050:80'
+  api:
+    build:
+      # build the image as specified by the Dockerfile in the 
+      # server directory 
+      dockerfile: Dockerfile.dev
+      context: ./server
+    volumes:
+      - /app/node_modules
+      # map the server folder in the local working 
+      # directory to the app folder inside the container
+
+      # any time we make a change in the 'server' folder 
+      # that change will be reflected in the app directory of our
+      # container
+      - ./server:/app
+    # default pguser and pgdatabase are postgres
+    # default pgport is 5432
+    # we specify all the defaults
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PGUSER=postgres
+      - PGHOST=postgres
+      - PGDATABASE=postgres
+      - PGPASSWORD=postgres_password
+      - PGPORT=5432
+  client:
+    environment:
+      - WDS_SOCKET_PORT=0
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./client
+    volumes:
+      # make sure the node_modules folder in the container 
+      # is not overwritten by anything (like another node_modules folder)
+      # in the current working directory 
+      - /app/node_modules
+      # everything else in the client local directory should go into the app
+      # folder in this client container 
+      - ./client:/app
+  worker:
+    build:
+      dockerfile: Dockerfile.dev
+      context: ./worker
+    volumes:
+      - /app/node_modules
+      - ./worker:/app
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+  
+
+  
